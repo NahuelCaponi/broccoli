@@ -84,3 +84,27 @@ func (_ ledger) GetAllByAccount(account int64) ([]LedgerEntry, error) {
 
 	return ledgerList, err
 }
+
+func (_ ledger) GetAgregation() (int64, error) {
+	var total int64
+	var rows *sql.Rows
+	var err = handleRetries(func() error {
+		var err error
+		rows, err = db.Query("SELECT sum(amount) FROM ledger")
+		return err
+	})
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&total)
+
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	return total, err
+}
