@@ -28,8 +28,7 @@ func initialize(db *sql.DB) {
 			balance INTEGER NOT NULL,
 
 			UNIQUE (alias),
-			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-			CHECK (balance >= 0))`,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`,
 		`CREATE TABLE transactions (
 			id INTEGER PRIMARY KEY AUTO_INCREMENT,
 			created_at TIMESTAMP(6) NOT NULL,
@@ -60,12 +59,11 @@ func initialize(db *sql.DB) {
 		}
 	}
 
-	var sysUser, err  =Users.Insert("broccoli", "admin")
+	sysUser, err := Users.Insert("broccoli", "admin")
 	if err != nil {
 		log.Fatal("Error creating system user: ", err)
 	}
-	
-	Accounts.Insert("broccoli", sysUser.Id)
 
+	Accounts.Insert("broccoli", sysUser.Id)
 
 }

@@ -30,3 +30,7 @@ func Connect(databaseName string) {
 func Close() {
 	db.Close()
 }
+
+func Begin() (*sql.Tx, error) {
+	return db.Begin()
+}

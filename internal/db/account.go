@@ -72,9 +72,19 @@ func (_ accounts) FindByAlias(alias string) (Account, error) {
 	})
 	return account, err
 }
+func (_ accounts) FindByUserId(userId int64) (Account, error) {
+	var account Account
+	err := handleRetries(func() error {
+		row := db.QueryRow("SELECT "+accountQuery+" FROM accounts WHERE user_id = ?", userId)
+		var err error
+		account, err = populateAccountWithRow(row)
+		return err
+	})
+	return account, err
+}
 
 // ==== For transactions ====
-func (_ accounts) FindForUpdateByUserId(tx *sql.Tx, userId int) (Account, error) {
+func (_ accounts) FindForUpdateByUserId(tx *sql.Tx, userId int64) (Account, error) {
 	var account Account
 	err := handleRetries(func() error {
 		row := tx.QueryRow("SELECT "+accountQuery+" FROM accounts WHERE user_id = ? FOR UPDATE", userId)
@@ -84,10 +94,20 @@ func (_ accounts) FindForUpdateByUserId(tx *sql.Tx, userId int) (Account, error)
 	})
 	return account, err
 }
+func (_ accounts) FindForUpdateByAlias(tx *sql.Tx, alias string) (Account, error) {
+	var account Account
+	err := handleRetries(func() error {
+		row := tx.QueryRow("SELECT "+accountQuery+" FROM accounts WHERE alias = ? FOR UPDATE", alias)
+		var err error
+		account, err = populateAccountWithRow(row)
+		return err
+	})
+	return account, err
+}
 func (_ accounts) UpdateBalance(tx *sql.Tx, acc *Account) error {
 	err := handleRetries(func() error {
 		acc.UpdatedAt = time.Now().UTC().Truncate(time.Microsecond)
-		_, err := tx.Exec("Update accounts SET updated_at = ?, balance = ? WHERE id = ?", acc.Balance, acc.Alias, acc.Id)
+		_, err := tx.Exec("Update accounts SET updated_at = ?, balance = ? WHERE id = ?", acc.UpdatedAt, acc.Balance, acc.Id)
 
 		return err
 	})

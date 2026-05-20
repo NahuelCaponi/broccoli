@@ -72,7 +72,7 @@ func (_ users) FindByUserName(username string) (User, error) {
 	return user, err
 }
 
-func (_ users) FindByID(id int) (User, error) {
+func (_ users) FindByID(id int64) (User, error) {
 	var user User
 	err := handleRetries(func() error {
 		row := db.QueryRow("SELECT "+userQuery+" FROM users WHERE id = ?", id)
@@ -85,7 +85,7 @@ func (_ users) FindByID(id int) (User, error) {
 func (_ users) GetAll() ([]User, error) {
 	var users []User
 	var rows *sql.Rows
-	var err = handleRetries(func() error {
+	err := handleRetries(func() error {
 		var err error
 		rows, err = db.Query("SELECT " + userQuery + " FROM users")
 		return err

@@ -55,7 +55,7 @@ func (_ transactions) Insert(tx *sql.Tx, amount, accountOrigin, accountDestinati
 func (_ transactions) GetAllByAccountOrigin(accountOrigin int64) ([]Transaction, error) {
 	var transactions []Transaction
 	var rows *sql.Rows
-	var err = handleRetries(func() error {
+	err := handleRetries(func() error {
 		var err error
 		rows, err = db.Query("SELECT "+transactionQuery+" FROM transactions WHERE account_origin = ?", accountOrigin)
 		return err
@@ -78,7 +78,7 @@ func (_ transactions) GetAllByAccountOrigin(accountOrigin int64) ([]Transaction,
 func (_ transactions) GetAllByAccountDestination(accountDestination int64) ([]Transaction, error) {
 	var transactions []Transaction
 	var rows *sql.Rows
-	var err = handleRetries(func() error {
+	err := handleRetries(func() error {
 		var err error
 		rows, err = db.Query("SELECT "+transactionQuery+" FROM transactions WHERE account_destination = ?", accountDestination)
 		return err
